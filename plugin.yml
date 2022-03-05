@@ -1,0 +1,17 @@
+name: SussyPlugin
+version: 1.0
+author: Leeemon
+main: xyz.titnoas.sussyplugin.SussyPlugin
+api-version: 1.18
+prefix: SussyPlugin
+depend: [NoteBlockAPI, ProtocolLib]
+
+commands:
+  sus:
+    description: sus
+    usage: /sus
+    permission: sussyplugin.sus
+  testbook:
+    description: test book
+    usage: /testbook (key)
+    permission: sussyplugin.testing
