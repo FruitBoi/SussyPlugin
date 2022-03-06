@@ -13,5 +13,5 @@ commands:
     permission: sussyplugin.sus
   testbook:
     description: test book
-    usage: /testbook (key)
+    usage: /testbook (key) (level)
     permission: sussyplugin.testing
