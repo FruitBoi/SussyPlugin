@@ -1,10 +1,12 @@
 package xyz.titnoas.sussyplugin;
 
+import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.titnoas.sussyplugin.Commands.GiveTestBook;
@@ -29,7 +31,11 @@ public class SussyPlugin extends JavaPlugin {
 		customItemKey = new NamespacedKey(this, "CUSTOMITEM");
 		this.getLogger().log(Level.INFO, "Enabling SussyPlugin");
 		this.getCommand("sus").setExecutor(new Hello(this));
-		this.getCommand("testbook").setExecutor(new GiveTestBook(this));
+		var testbookcmd = new GiveTestBook(this);
+
+		this.getCommand("testbook").setExecutor(testbookcmd);
+		this.getCommand("testbook").setTabCompleter(testbookcmd);
+
 		if(Glow.glowKey == null)
 			Glow.glowKey = new NamespacedKey(SussyPlugin.sussyPlugin, "GlowEnchant");
 		registerGlow();
@@ -38,7 +44,6 @@ public class SussyPlugin extends JavaPlugin {
 		manager.registerEvents(new ItemsListener(this), this);
 		ItemUtils.Init();
 		ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-
 	}
 
 	@Override

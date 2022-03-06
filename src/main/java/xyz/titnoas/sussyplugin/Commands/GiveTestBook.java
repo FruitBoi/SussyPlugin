@@ -5,22 +5,45 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.titnoas.sussyplugin.ItemUtils;
 import xyz.titnoas.sussyplugin.SussyPlugin;
 import xyz.titnoas.sussyplugin.customenhants.CustomEnchant;
 
-public class GiveTestBook implements CommandExecutor {
+import java.util.ArrayList;
+import java.util.List;
+
+public class GiveTestBook implements CommandExecutor, TabCompleter {
 
 	private SussyPlugin plugin;
 
 	public GiveTestBook(SussyPlugin pl){
 		this.plugin = pl;
+	}
+
+	@Override
+	public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+
+		if(args.length == 0)
+		{
+
+			List<String> options = new ArrayList<>();
+
+			for(CustomEnchant enchant : ItemUtils.customEnchants)
+				options.add(enchant.key);
+
+			return options;
+		}
+		return new ArrayList<>();
+
 	}
 
 	@Override
@@ -93,5 +116,6 @@ public class GiveTestBook implements CommandExecutor {
 		//command.
 		return true;
 	}
+
 
 }
