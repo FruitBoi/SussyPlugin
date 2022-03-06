@@ -2,6 +2,10 @@ package xyz.titnoas.sussyplugin.utilshit;
 
 import io.papermc.paper.enchantments.EnchantmentRarity;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.format.Style;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -9,9 +13,12 @@ import org.bukkit.entity.EntityCategory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import xyz.titnoas.sussyplugin.SussyPlugin;
 
+import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class Glow extends Enchantment {
 

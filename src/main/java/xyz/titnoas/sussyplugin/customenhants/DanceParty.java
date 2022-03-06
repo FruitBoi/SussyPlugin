@@ -1,13 +1,16 @@
 package xyz.titnoas.sussyplugin.customenhants;
 
+import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import com.xxmicloxx.NoteBlockAPI.model.RepeatMode;
 import com.xxmicloxx.NoteBlockAPI.model.Song;
 import com.xxmicloxx.NoteBlockAPI.songplayer.EntitySongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
 import net.kyori.adventure.sound.SoundStop;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -83,6 +86,41 @@ public class DanceParty extends CustomEnchant implements Listener {
 	}
 
 	@EventHandler
+	public void onArmor(PlayerArmorChangeEvent ev){
+
+		if(ev.getNewItem() == null)
+			return;
+
+		if(this.itemHasCustomEnchant(ev.getOldItem()) && !this.itemHasCustomEnchant(ev.getNewItem())){
+
+			EntitySongPlayer match = null;
+
+			for(EntitySongPlayer player : entitySongPlayers){
+				if(player.getEntity().getUniqueId() != ev.getPlayer().getUniqueId())
+					continue;
+
+				match = player;
+				break;
+			}
+
+			if(match == null)
+				return;
+
+			match.setPlaying(false);
+
+			entitySongPlayers.remove(match);
+			return;
+		}
+
+		if(!this.itemHasCustomEnchant(ev.getNewItem()))
+			return;
+
+		int level = this.GetItemEnchantLevel(ev.getNewItem());
+
+		StartMusicShit(ev.getPlayer(), level);
+	}
+
+	@EventHandler
 	public void onDrop(ItemSpawnEvent ev){
 
 		ItemStack item = ev.getEntity().getItemStack();
@@ -92,8 +130,12 @@ public class DanceParty extends CustomEnchant implements Listener {
 
 		int level = this.GetItemEnchantLevel(item);
 
+		StartMusicShit(ev.getEntity(), level);
 
+		ev.getEntity().setWillAge(false);
+	}
 
+	private static void StartMusicShit(Entity target, int level){
 		File file = new File(Bukkit.getPluginsFolder() + "/SussyPlugin/" + level + ".nbs");
 
 		if(!file.exists())
@@ -103,7 +145,7 @@ public class DanceParty extends CustomEnchant implements Listener {
 
 		EntitySongPlayer nbsPlayer = new EntitySongPlayer(song);
 
-		nbsPlayer.setEntity(ev.getEntity());
+		nbsPlayer.setEntity(target);
 		nbsPlayer.setRepeatMode(RepeatMode.ALL);
 		nbsPlayer.setDistance(16);
 
@@ -114,7 +156,5 @@ public class DanceParty extends CustomEnchant implements Listener {
 		nbsPlayer.setPlaying(true);
 
 		entitySongPlayers.add(nbsPlayer);
-
-		ev.getEntity().setWillAge(false);
 	}
 }
