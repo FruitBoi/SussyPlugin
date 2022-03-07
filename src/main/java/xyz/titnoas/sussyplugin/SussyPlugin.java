@@ -9,6 +9,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import xyz.titnoas.sussyplugin.Commands.ApplyEffect;
 import xyz.titnoas.sussyplugin.Commands.GiveTestBook;
 import xyz.titnoas.sussyplugin.Commands.Hello;
 import xyz.titnoas.sussyplugin.listener.ItemsListener;
@@ -33,6 +34,7 @@ public class SussyPlugin extends JavaPlugin {
 		this.getLogger().log(Level.INFO, "Enabling SussyPlugin");
 		this.getCommand("sus").setExecutor(new Hello(this));
 		this.getCommand("testbook").setExecutor(new GiveTestBook(this));
+		this.getCommand("custome").setExecutor(new ApplyEffect(this));
 		if(Glow.glowKey == null)
 			Glow.glowKey = new NamespacedKey(SussyPlugin.sussyPlugin, "GlowEnchant");
 		registerGlow();
