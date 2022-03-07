@@ -7,9 +7,12 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import xyz.titnoas.sussyplugin.Commands.GiveTestBook;
 import xyz.titnoas.sussyplugin.Commands.Hello;
 import xyz.titnoas.sussyplugin.listener.ItemsListener;
+import xyz.titnoas.sussyplugin.utilshit.CustomEffectType;
 import xyz.titnoas.sussyplugin.utilshit.Glow;
 
 import java.lang.reflect.Field;
@@ -33,6 +36,9 @@ public class SussyPlugin extends JavaPlugin {
 		if(Glow.glowKey == null)
 			Glow.glowKey = new NamespacedKey(SussyPlugin.sussyPlugin, "GlowEnchant");
 		registerGlow();
+		if(CustomEffectType.customKey == null)
+			CustomEffectType.customKey = new NamespacedKey(SussyPlugin.sussyPlugin, "CustomEnchant");
+		registerCustomEffect();
 		PluginManager manager = Bukkit.getPluginManager();
 
 		manager.registerEvents(new ItemsListener(this), this);
@@ -41,9 +47,10 @@ public class SussyPlugin extends JavaPlugin {
 
 	}
 
+
+
 	@Override
 	public void onDisable(){
-
 	}
 
 	public void registerGlow() {
@@ -58,6 +65,26 @@ public class SussyPlugin extends JavaPlugin {
 		try {
 			Glow glow = new Glow();
 			Enchantment.registerEnchantment(glow);
+		}
+		catch (IllegalArgumentException e){
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	public void registerCustomEffect() {
+		try {
+			Field f = PotionEffectType.class.getDeclaredField("acceptingNew");
+			f.setAccessible(true);
+			f.set(null, true);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			CustomEffectType customEffectType = new CustomEffectType();
+			PotionEffectType.registerPotionEffectType(customEffectType);
 		}
 		catch (IllegalArgumentException e){
 		}
