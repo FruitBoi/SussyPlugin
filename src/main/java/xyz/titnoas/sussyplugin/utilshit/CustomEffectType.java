@@ -15,7 +15,7 @@ public class CustomEffectType extends PotionEffectType {
     public static NamespacedKey customKey;
 
     public CustomEffectType() {
-        super(6969, customKey);
+        super(32, customKey);
     }
 
     @Override
