@@ -36,6 +36,7 @@ public class SussyPlugin extends JavaPlugin {
 
 		manager.registerEvents(new ItemsListener(this), this);
 		ItemUtils.Init();
+		EffectUtils.Init();
 		ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
 
 	}
