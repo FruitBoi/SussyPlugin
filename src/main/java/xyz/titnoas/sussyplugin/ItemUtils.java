@@ -87,7 +87,7 @@ public class ItemUtils {
 		List<CustomEnchant> applied = GetItemCustomEnchants(item);
 
 		List<Enchantment> notGlow = new ArrayList<>();
-		if(!item.getEnchantments().isEmpty()) {
+		if (!item.getEnchantments().isEmpty()) {
 			for (Enchantment ench : item.getEnchantments().keySet()) {
 				if (!ench.getKey().toString().equals("sussyplugin:glowenchant")) {
 					notGlow.add(ench);

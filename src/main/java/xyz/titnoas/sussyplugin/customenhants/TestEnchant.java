@@ -3,10 +3,14 @@ package xyz.titnoas.sussyplugin.customenhants;
 import io.papermc.paper.datapack.DatapackManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import xyz.titnoas.sussyplugin.SussyPlugin;
 
 import java.util.List;
@@ -26,6 +30,8 @@ public class TestEnchant extends CustomEnchant implements Listener {
 
 		if(!this.itemHasCustomEnchant(ev.getItem()))
 			return;
+
+		ItemStack spawner = new ItemStack(Material.SPAWNER);
 
 
 
