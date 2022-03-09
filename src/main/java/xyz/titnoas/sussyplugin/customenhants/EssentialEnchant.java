@@ -53,12 +53,10 @@ public class EssentialEnchant extends CustomEnchant implements Listener {
 			return;
 
 		if (!this.itemHasCustomEnchant(player.getItemInHand())) {
-			Bukkit.broadcastMessage("no enchanto itemo");
 			return;
 		}
 
 		int level = this.GetItemEnchantLevel(player.getItemInHand());
-		Bukkit.broadcastMessage("level: " + level);
 		Entity damaged = ev.getEntity();
 
 		EntityType type = damaged.getType();
@@ -66,13 +64,11 @@ public class EssentialEnchant extends CustomEnchant implements Listener {
 		var essences = EssenceUtils.FindDroppableByType(type);
 
 		if (essences.isEmpty()) {
-			Bukkit.broadcastMessage("no essences found for type");
 			return;
 		}
 
 		for (DroppableEssence essence : essences) {
 			if (!(essence instanceof Essence e)) {
-				Bukkit.broadcastMessage("skipped");
 				continue;
 			}
 
@@ -84,17 +80,27 @@ public class EssentialEnchant extends CustomEnchant implements Listener {
 
 			Map<Integer, Double> mapping = new HashMap();
 
-			for(int i = 0; i <= level; i++){
+			for(int i = 1; i <= level; i++){
 				double weight = 2 / (Math.pow(2, i));
 				mapping.put(i, weight);
 			}
 
 			Integer weightedLevel = EssenceUtils.getWeightedRandom(mapping, Utils.getRandom());
 
+			Integer amount = 1;
 
+			Map<Integer, Double> amountMapping = new HashMap<>();
 
-			ItemStack essenceStack = e.CreateItem(next + 1, weightedLevel);
-			Bukkit.broadcastMessage("dropping");
+			if(level > 1){
+				for(int i = 1; i <= weightedLevel; i++){
+					double weight = 20 / (Math.pow(2, i) * Math.pow(3, weightedLevel));
+					amountMapping.put(i, weight);
+				}
+
+				amount = EssenceUtils.getWeightedRandom(amountMapping, Utils.getRandom());
+			}
+
+			ItemStack essenceStack = e.CreateItem(amount, weightedLevel);
 			damaged.getWorld().dropItem(damaged.getLocation(), essenceStack);
 		}
 
