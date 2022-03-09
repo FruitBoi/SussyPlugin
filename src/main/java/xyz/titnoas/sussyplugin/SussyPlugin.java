@@ -3,15 +3,19 @@ package xyz.titnoas.sussyplugin;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.*;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.titnoas.sussyplugin.Commands.GiveTestBook;
 import xyz.titnoas.sussyplugin.Commands.Hello;
 import xyz.titnoas.sussyplugin.listener.ItemsListener;
+import xyz.titnoas.sussyplugin.obtaining.essences.EssenceListener;
+import xyz.titnoas.sussyplugin.obtaining.essences.EssenceUtils;
 import xyz.titnoas.sussyplugin.utilshit.Glow;
 
 import java.lang.reflect.Field;
@@ -42,13 +46,14 @@ public class SussyPlugin extends JavaPlugin {
 		PluginManager manager = Bukkit.getPluginManager();
 
 		manager.registerEvents(new ItemsListener(this), this);
+		manager.registerEvents(new EssenceListener(this), this);
 		ItemUtils.Init();
+		EssenceUtils.RegisterEssences();
 		ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
 	}
 
 	@Override
 	public void onDisable(){
-
 	}
 
 	public void registerGlow() {

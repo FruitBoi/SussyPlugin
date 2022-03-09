@@ -36,6 +36,7 @@ public class ItemUtils {
 		customEnchants.add(new Soulbound());
 		customEnchants.add(new LastStand());
 		customEnchants.add(new DanceParty());
+		customEnchants.add(new EssentialEnchant());
 	}
 
 	public static List<CustomEnchant> GetItemCustomEnchants(ItemStack item) {
@@ -123,6 +124,31 @@ public class ItemUtils {
 				meta.removeEnchant(ench);
 			}
 		stack.setItemMeta(meta);
+	}
+
+	public static <T extends CustomEnchant> boolean ItemHasEnchantOfType(Class<T> type, ItemStack item) {
+
+		var enchants = ItemUtils.GetItemCustomEnchants(item);
+
+		if (enchants.isEmpty())
+			return false;
+
+		for (CustomEnchant enchant : enchants) {
+
+			if (type.isInstance(enchant))
+				return true;
+		}
+		return false;
+	}
+
+	public static <T extends CustomEnchant> T GetCustomEnchantOfType(Class<T> type) {
+
+		for (CustomEnchant enchant : customEnchants) {
+
+			if (type.isInstance(enchant))
+				return (T)enchant;
+		}
+		return null;
 	}
 
 	public static void ApplyCustomEnchantToItem(ItemStack item, CustomEnchant enchant, int level, boolean setLore) {

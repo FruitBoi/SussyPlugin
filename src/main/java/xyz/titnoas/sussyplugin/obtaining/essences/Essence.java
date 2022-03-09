@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import xyz.titnoas.sussyplugin.ItemUtils;
 import xyz.titnoas.sussyplugin.customenhants.CustomEnchant;
+import xyz.titnoas.sussyplugin.utilshit.RomanNumber;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class Essence extends CustomEnchant {
 
 		this.itemType = Material.FIREWORK_STAR;
 		this.allowedItems = List.of(itemType);
-
+		this.color = color;
 		this.setLore = lore;
 		this.setGlow = glow;
 		this.displayName = displayName;
@@ -45,6 +46,9 @@ public class Essence extends CustomEnchant {
 
 	public ItemStack CreateItem(int amount, int level){
 
+		if(level < 1)
+			level = 1;
+
 		ItemStack stack = new ItemStack(itemType);
 		stack.setAmount(amount);
 
@@ -52,8 +56,21 @@ public class Essence extends CustomEnchant {
 
 		if(displayName) {
 			ItemMeta meta = stack.getItemMeta();
-			meta.setDisplayName(ChatColor.RESET + "" + ChatColor.of(new java.awt.Color(color.asRGB())) + "" + ChatColor.BOLD + localizedName);
+
+			String levelNum = "";
+			if(level > 100)
+				levelNum = Integer.toString(level);
+			else
+				levelNum = RomanNumber.toRoman(level);
+
+
+			meta.setDisplayName(ChatColor.RESET + "" + ChatColor.of(new java.awt.Color(color.asRGB())) + "" + ChatColor.BOLD + localizedName + " " + levelNum);
+			stack.setItemMeta(meta);
 		}
+
+		ItemMeta meta = stack.getItemMeta();
+		meta.setLore(List.of());
+		stack.setItemMeta(meta);
 		return stack;
 	}
 }
