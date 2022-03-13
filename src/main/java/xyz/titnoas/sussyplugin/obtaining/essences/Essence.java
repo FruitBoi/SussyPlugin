@@ -5,6 +5,7 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.meta.ItemMeta;
 import xyz.titnoas.sussyplugin.ItemUtils;
 import xyz.titnoas.sussyplugin.customenhants.CustomEnchant;
@@ -42,6 +43,10 @@ public class Essence extends CustomEnchant {
 
 		if(setGlow)
 			ItemUtils.AddEnchantGlow(item);
+	}
+
+	public RecipeChoice getRecipeChoice(int level){
+		return new RecipeChoice.ExactChoice(CreateItem(1, level));
 	}
 
 	public ItemStack CreateItem(int amount, int level){

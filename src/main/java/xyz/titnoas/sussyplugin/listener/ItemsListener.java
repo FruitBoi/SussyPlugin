@@ -1,6 +1,7 @@
 package xyz.titnoas.sussyplugin.listener;
 
 import com.destroystokyo.paper.event.inventory.PrepareGrindstoneEvent;
+import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -25,6 +26,7 @@ public class ItemsListener implements Listener {
 
 	private SussyPlugin plugin;
 
+	public static int troll = -1;
 
 	public ItemsListener(SussyPlugin plugin) {
 		this.plugin = plugin;

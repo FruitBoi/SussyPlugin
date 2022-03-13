@@ -46,7 +46,7 @@ public class FireworkStarEssence extends Essence implements Listener {
 
 		for(ItemStack item : ev.getInventory().getMatrix())
 		{
-			if(!ItemUtils.ItemHasEnchantOfType(FireworkStarEssence.class, item))
+			if(!ItemUtils.ItemHasEnchantOfType(Essence.class, item))
 				continue;
 				ev.getInventory().setResult(new ItemStack(Material.AIR));
 

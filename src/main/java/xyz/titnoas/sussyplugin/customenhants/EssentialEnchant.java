@@ -41,7 +41,7 @@ public class EssentialEnchant extends CustomEnchant implements Listener {
 		this.key = "ESSENTIAL";
 		this.localizedName = "Essential";
 		Bukkit.getPluginManager().registerEvents(this, SussyPlugin.sussyPlugin);
-		this.maxLevel = 100;
+		this.maxLevel = 3;
 	}
 
 	@EventHandler
@@ -61,7 +61,7 @@ public class EssentialEnchant extends CustomEnchant implements Listener {
 
 		EntityType type = damaged.getType();
 
-		var essences = EssenceUtils.FindDroppableByType(type);
+		var essences = EssenceUtils.FindDroppableByEntity(ev.getEntity());
 
 		if (essences.isEmpty()) {
 			return;
