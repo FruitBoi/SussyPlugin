@@ -30,7 +30,7 @@ public class VelocityPlugin {
 	private final ProxyServer server;
 	private final Logger logger;
 
-	public static int troll;
+	public static int troll = 0;
 
 	@Inject
 	public VelocityPlugin(ProxyServer server, Logger logger) {
@@ -92,7 +92,7 @@ public class VelocityPlugin {
 
 		ServerPing.Builder ping = ev.getPing().asBuilder();
 
-		if(troll != -1)
+		if(troll != 0)
 		{
 			ping.onlinePlayers(ping.getOnlinePlayers() + troll);
 

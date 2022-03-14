@@ -8,14 +8,22 @@ public class DroppableFireworkEssence extends FireworkStarEssence implements Dro
 
 	private final EntityType mob;
 
-	public DroppableFireworkEssence(Color color, String key, String name, EntityType dropMob, boolean glow, boolean lore, boolean showDisplayName) {
+	private float chanceDropMultiplier;
+
+	public DroppableFireworkEssence(Color color, String key, String name, EntityType dropMob, boolean glow, boolean lore, boolean showDisplayName, float dropMult) {
 		super(color, key, name, glow, lore, showDisplayName);
 		this.mob = dropMob;
+		this.chanceDropMultiplier = dropMult;
 	}
 
 	@Override
 	public boolean isValidEntity(Entity ent) {
 		return ent.getType() == mob;
+	}
+
+	@Override
+	public float chanceMultiplier(){
+		return chanceDropMultiplier;
 	}
 
 }

@@ -20,6 +20,7 @@ public class UpEnchant extends CustomEnchant implements Listener {
 		this.key = "UP";
 		this.localizedName = "Skyward";
 		Bukkit.getPluginManager().registerEvents(this, SussyPlugin.sussyPlugin);
+		this.maxLevel = 3;
 	}
 
 	@EventHandler()

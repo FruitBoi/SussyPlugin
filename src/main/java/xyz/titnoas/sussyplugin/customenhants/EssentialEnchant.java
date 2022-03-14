@@ -73,7 +73,7 @@ public class EssentialEnchant extends CustomEnchant implements Listener {
 			}
 
 
-			float chance = level * 0.05f;
+			float chance = level * 0.05f * essence.chanceMultiplier();
 			if (!Utils.doChance(chance)) {
 				continue;
 			}

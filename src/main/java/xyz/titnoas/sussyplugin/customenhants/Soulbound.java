@@ -18,6 +18,8 @@ public class Soulbound extends CustomEnchant implements Listener {
 		this.key = "SOULBOUND";
 		this.localizedName = "Soulbound";
 		Bukkit.getPluginManager().registerEvents(this, SussyPlugin.sussyPlugin);
+		this.allowBookCombine = false;
+		this.maxLevel = 2;
 	}
 
 	@EventHandler

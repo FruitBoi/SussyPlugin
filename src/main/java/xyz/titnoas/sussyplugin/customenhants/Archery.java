@@ -27,6 +27,7 @@ public class Archery extends CustomEnchant implements Listener {
 		this.key = "ARCHERY";
 		this.localizedName = "Archery";
 		Bukkit.getPluginManager().registerEvents(this, SussyPlugin.sussyPlugin);
+		this.maxLevel = 10;
 	}
 
 	@EventHandler
@@ -169,7 +170,7 @@ public class Archery extends CustomEnchant implements Listener {
 
 		int level = this.GetItemEnchantLevel(bow);
 
-		float percent = level / 100f;
+		float percent = (level / 10f);
 
 		pair.correctionCoefficient = percent;
 

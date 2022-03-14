@@ -30,11 +30,8 @@ public class SplashysIdea extends CustomEnchant implements Listener {
 	@EventHandler
 	public void onEntityDamaged(EntityDamageByEntityEvent ev) {
 
-		if (!(ev.getDamager() instanceof Player) || !(ev.getEntity() instanceof Player))
+		if (!(ev.getDamager() instanceof Player damager) || !(ev.getEntity() instanceof Player damagee))
 			return;
-
-		Player damager = (Player) ev.getDamager();
-		Player damagee = (Player) ev.getEntity();
 
 		ItemStack mainHand = damager.getInventory().getItemInMainHand();
 

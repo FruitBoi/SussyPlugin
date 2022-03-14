@@ -2,6 +2,7 @@ package xyz.titnoas.sussyplugin.listener;
 
 import com.destroystokyo.paper.event.inventory.PrepareGrindstoneEvent;
 import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
+import com.destroystokyo.paper.loottable.LootableInventoryReplenishEvent;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -9,18 +10,24 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.loot.LootTable;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 import xyz.titnoas.sussyplugin.ItemUtils;
 import xyz.titnoas.sussyplugin.SussyPlugin;
 import xyz.titnoas.sussyplugin.customenhants.CustomEnchant;
+import xyz.titnoas.sussyplugin.customenhants.DanceParty;
+import xyz.titnoas.sussyplugin.customenhants.EssentialEnchant;
+import xyz.titnoas.sussyplugin.utilshit.Utils;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 public class ItemsListener implements Listener {
 
@@ -96,6 +103,35 @@ public class ItemsListener implements Listener {
 			return;
 
 		ItemUtils.RemoveAllCustomEnchantsFromItem(result, false);
+	}
+
+	@EventHandler
+	public void onLoot(LootGenerateEvent ev){
+
+		if(Utils.doChance(10/100f)) {
+
+			//Could not think of a better way to initally hand out essential books. I made the chance not
+			//too grindy but it will still take someone a bit to find it. Hoping to make the book itself quite valuable.
+
+			List<ItemStack> loot = ev.getLoot();
+
+			var essential = ItemUtils.GetCustomEnchantOfType(EssentialEnchant.class);
+
+			loot.add(ItemUtils.CreateCustomEnchantBook(essential, 1));
+		}
+
+		if(Utils.doChance(0.1f/100f))
+		{
+			//:Catjam:
+
+			List<ItemStack> loot = ev.getLoot();
+
+			var danceParty = ItemUtils.GetCustomEnchantOfType(DanceParty.class);
+
+			int rand = Utils.getRandom().nextInt(1, 11);
+
+			loot.add(ItemUtils.CreateCustomEnchantBook(danceParty, rand));
+		}
 	}
 
 	@EventHandler

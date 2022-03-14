@@ -6,4 +6,6 @@ import org.bukkit.entity.EntityType;
 public interface DroppableEssence {
 
 	boolean isValidEntity(Entity ent);
+
+	float chanceMultiplier();
 }

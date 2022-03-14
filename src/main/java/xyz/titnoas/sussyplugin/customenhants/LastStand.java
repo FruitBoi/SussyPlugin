@@ -29,7 +29,8 @@ public class LastStand extends CustomEnchant implements Listener {
 				Material.IRON_HELMET, Material.IRON_CHESTPLATE, Material.IRON_LEGGINGS, Material.IRON_BOOTS,
 				Material.GOLDEN_HELMET, Material.GOLDEN_CHESTPLATE, Material.GOLDEN_LEGGINGS, Material.GOLDEN_BOOTS,
 				Material.DIAMOND_HELMET, Material.DIAMOND_CHESTPLATE, Material.DIAMOND_LEGGINGS, Material.DIAMOND_BOOTS,
-				Material.NETHERITE_HELMET, Material.NETHERITE_CHESTPLATE, Material.NETHERITE_LEGGINGS, Material.NETHERITE_BOOTS);
+				Material.NETHERITE_HELMET, Material.NETHERITE_CHESTPLATE, Material.NETHERITE_LEGGINGS, Material.NETHERITE_BOOTS,
+				Material.TURTLE_HELMET, Material.CARVED_PUMPKIN);
 		this.key = "LASTSTAND";
 		this.localizedName = "Last Stand";
 		this.maxLevel = 1;
@@ -49,9 +50,6 @@ public class LastStand extends CustomEnchant implements Listener {
 		PlayerInventory playerInv = player.getInventory();
 
 		ItemStack[] armor = playerInv.getArmorContents();
-
-		if(armor == null)
-			return;
 
 		List<ItemStack> lastStandArmor = new ArrayList<>();
 
@@ -87,7 +85,6 @@ public class LastStand extends CustomEnchant implements Listener {
 		player.addPotionEffect(eff);
 		player.addPotionEffect(regen);
 
-		player.sendMessage(ChatColor.RESET + "" + ChatColor.RED + ":quitincredible:");
 
 		ItemStack remove = lastStandArmor.get(index);
 
@@ -95,6 +92,7 @@ public class LastStand extends CustomEnchant implements Listener {
 
 
 		ItemUtils.RemoveEnchantFromItem(remove, this);
+
 		if(!ItemUtils.ItemHasAnyCustomEnchantsOrEnchants(remove))
 			ItemUtils.RemoveGlow(remove);
 
