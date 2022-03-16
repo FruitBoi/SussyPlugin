@@ -4,21 +4,28 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.ConnectionHandshakeEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
+import com.velocitypowered.api.event.player.TabCompleteEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyPingEvent;
+import com.velocitypowered.api.event.query.ProxyQueryEvent;
 import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.QueryResponse;
 import com.velocitypowered.api.proxy.server.ServerPing;
 import com.velocitypowered.api.util.ModInfo;
+import dev.simplix.protocolize.api.Protocolize;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
+import xyz.titnoas.velocity.PacketListener.Listener;
 
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,7 +58,7 @@ public class VelocityPlugin {
 
 	@Subscribe
 	public void onProxyInitialization(ProxyInitializeEvent ev){
-
+		Protocolize.listenerProvider().registerListener(new Listener());
 	}
 
 	@Subscribe
@@ -84,6 +91,7 @@ public class VelocityPlugin {
 
 
 			logger.log(Level.INFO, ev.getPlayer().getUsername() + " cannot join modded because they don't have forge installed");
+
 		}
 	}
 
@@ -91,6 +99,8 @@ public class VelocityPlugin {
 	public void onProxyPing(ProxyPingEvent ev){
 
 		ServerPing.Builder ping = ev.getPing().asBuilder();
+
+		logger.log(Level.INFO, "Serverlist ping from " + ev.getConnection().getRemoteAddress().toString());
 
 		if(troll != 0)
 		{
@@ -101,6 +111,31 @@ public class VelocityPlugin {
 		}
 
 		ev.setPing(ping.build());
+	}
+
+	@Subscribe
+	public void onTabComplete(TabCompleteEvent ev){
+
+		if(ev.getPartialMessage().equalsIgnoreCase("/"))
+		{
+			ev.getSuggestions().clear();
+			ev.getSuggestions().add("Not today ;)");
+			return;
+		}
+	}
+
+	@Subscribe
+	public void onConn(ProxyQueryEvent ev){
+		QueryResponse.Builder response = ev.getResponse().toBuilder();
+
+		response.clearPlayers();
+		response.clearPlayers();
+
+		response.proxyVersion("1.8.x - 1.18.x");
+		response.plugins(QueryResponse.PluginInformation.of("TCSMP Plugins", "1.0"));
+
+
+		ev.setResponse(response.build());
 	}
 
 

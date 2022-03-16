@@ -134,15 +134,14 @@ public class EssenceUtils {
 			{
 				NamespacedKey upkey = new NamespacedKey(SussyPlugin.sussyPlugin, "Essence" + essence.key + i);
 				NamespacedKey downkey = new NamespacedKey(SussyPlugin.sussyPlugin, "Essence" + essence.key + i + "d");
-				ShapedRecipe recipe = new ShapedRecipe(upkey, essence.CreateItem(1, i));
-				recipe.shape("EEE", "EEE", "EEE");
+				ShapelessRecipe recipe = new ShapelessRecipe(upkey, essence.CreateItem(1, i));
 
-				RecipeChoice choice = new RecipeChoice.ExactChoice(essence.CreateItem(1, i - 1));
-				recipe.setIngredient('E', choice);
+				RecipeChoice choice = new RecipeChoice.ExactChoice(essence.CreateItem(4, i - 1));
+				recipe.addIngredient(choice);
 				Bukkit.addRecipe(recipe);
 
 				RecipeChoice choiceDown = new RecipeChoice.ExactChoice(essence.CreateItem(1, i));
-				ShapelessRecipe down = new ShapelessRecipe(downkey, essence.CreateItem(9, i - 1));
+				ShapelessRecipe down = new ShapelessRecipe(downkey, essence.CreateItem(4, i - 1));
 				down.addIngredient(choiceDown);
 				Bukkit.addRecipe(down);
 			}

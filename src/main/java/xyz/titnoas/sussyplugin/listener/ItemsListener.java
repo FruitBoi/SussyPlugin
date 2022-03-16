@@ -88,6 +88,7 @@ public class ItemsListener implements Listener {
 
 		ev.setResult(output);
 	}
+
 	@EventHandler
 	public void onGrindstone(PrepareGrindstoneEvent ev){
 
