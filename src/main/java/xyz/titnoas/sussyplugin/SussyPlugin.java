@@ -37,7 +37,7 @@ public class SussyPlugin extends JavaPlugin {
 
 		this.getCommand("testbook").setExecutor(testbookcmd);
 		this.getCommand("testbook").setTabCompleter(testbookcmd);
-
+		net.minecraft.server.Bootstrap.realStdoutPrintln("lol");
 		if(Glow.glowKey == null)
 			Glow.glowKey = new NamespacedKey(SussyPlugin.sussyPlugin, "GlowEnchant");
 		registerGlow();
