@@ -1,14 +1,10 @@
 package xyz.titnoas.sussyplugin;
 
-import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.*;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.titnoas.sussyplugin.Commands.GiveTestBook;
@@ -16,11 +12,12 @@ import xyz.titnoas.sussyplugin.Commands.Hello;
 import xyz.titnoas.sussyplugin.listener.ItemsListener;
 import xyz.titnoas.sussyplugin.obtaining.essences.EssenceListener;
 import xyz.titnoas.sussyplugin.obtaining.essences.EssenceUtils;
+import xyz.titnoas.sussyplugin.spawners.CustomSpawner;
+import xyz.titnoas.sussyplugin.spawners.CustomSpawnerMetadataPersistentType;
 import xyz.titnoas.sussyplugin.utilshit.Glow;
 
 import java.lang.reflect.Field;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class SussyPlugin extends JavaPlugin {
 
@@ -33,6 +30,7 @@ public class SussyPlugin extends JavaPlugin {
 	public void onEnable(){
 		sussyPlugin = this;
 		customItemKey = new NamespacedKey(this, "CUSTOMITEM");
+		CustomSpawner.customSpawnerMetaKey = new NamespacedKey(SussyPlugin.sussyPlugin, "CUSTOMSPAWNERMETA");
 		this.getLogger().log(Level.INFO, "Enabling SussyPlugin");
 		this.getCommand("sus").setExecutor(new Hello(this));
 		var testbookcmd = new GiveTestBook(this);

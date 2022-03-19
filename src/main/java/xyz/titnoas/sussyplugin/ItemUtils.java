@@ -37,6 +37,7 @@ public class ItemUtils {
 		customEnchants.add(new LastStand());
 		customEnchants.add(new DanceParty());
 		customEnchants.add(new EssentialEnchant());
+		customEnchants.add(new Gentle());
 	}
 
 	public static List<CustomEnchant> GetItemCustomEnchants(ItemStack item) {
