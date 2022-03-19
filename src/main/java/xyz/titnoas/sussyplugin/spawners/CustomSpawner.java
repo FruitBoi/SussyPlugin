@@ -28,9 +28,7 @@ public class CustomSpawner implements Listener {
 
 
 	public static CustomSpawnerMetadata fromSpawnerItem(ItemStack item){
-
-		var craft = CraftItemStack.asNMSCopy(item);
-		craft.isDamaged();
+		
 		ItemMeta itemMeta = item.getItemMeta();
 
 		var pdc = itemMeta.getPersistentDataContainer();
