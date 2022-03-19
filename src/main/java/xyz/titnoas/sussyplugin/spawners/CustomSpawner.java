@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -28,6 +29,8 @@ public class CustomSpawner implements Listener {
 
 	public static CustomSpawnerMetadata fromSpawnerItem(ItemStack item){
 
+		var craft = CraftItemStack.asNMSCopy(item);
+		craft.isDamaged();
 		ItemMeta itemMeta = item.getItemMeta();
 
 		var pdc = itemMeta.getPersistentDataContainer();
