@@ -36,7 +36,7 @@ public class EssenceUtils {
 		ItemUtils.customEnchants.add(new DroppableFireworkEssence(Color.fromRGB(222, 122, 250), "ENDERMAN_ESSENCE",
 				"Ender Essence", EntityType.ENDERMAN, true, false, true, 1.0f));
 
-		//no worky :(
+		//no worky :(??
 		ItemUtils.customEnchants.add(new DroppableFireworkEssence(Color.fromRGB(205, 184, 136), "SHULKER_PROJ_ESSENCE",
 				"Sky Essence", EntityType.SHULKER_BULLET, true, false, true, 1.0f));
 
@@ -134,14 +134,13 @@ public class EssenceUtils {
 			{
 				NamespacedKey upkey = new NamespacedKey(SussyPlugin.sussyPlugin, "Essence" + essence.key + i);
 				NamespacedKey downkey = new NamespacedKey(SussyPlugin.sussyPlugin, "Essence" + essence.key + i + "d");
-				ShapelessRecipe recipe = new ShapelessRecipe(upkey, essence.CreateItem(1, i));
+				ShapelessRecipe up = new ShapelessRecipe(upkey, essence.CreateItem(1, i));
 
-				RecipeChoice choice = new RecipeChoice.ExactChoice(essence.CreateItem(4, i - 1));
-				recipe.addIngredient(choice);
-				Bukkit.addRecipe(recipe);
+				up.addIngredient(4, essence.CreateItem(1, i - 1));
+				Bukkit.addRecipe(up);
 
-				RecipeChoice choiceDown = new RecipeChoice.ExactChoice(essence.CreateItem(1, i));
 				ShapelessRecipe down = new ShapelessRecipe(downkey, essence.CreateItem(4, i - 1));
+				RecipeChoice choiceDown = new RecipeChoice.ExactChoice(essence.CreateItem(1, i));
 				down.addIngredient(choiceDown);
 				Bukkit.addRecipe(down);
 			}

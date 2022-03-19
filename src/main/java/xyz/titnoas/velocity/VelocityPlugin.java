@@ -4,29 +4,27 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.connection.ConnectionHandshakeEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.player.TabCompleteEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.event.query.ProxyQueryEvent;
-import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.QueryResponse;
 import com.velocitypowered.api.proxy.server.ServerPing;
-import com.velocitypowered.api.util.ModInfo;
 import dev.simplix.protocolize.api.Protocolize;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
-import xyz.titnoas.velocity.PacketListener.Listener;
+import space.arim.libertybans.api.LibertyBans;
+import space.arim.omnibus.Omnibus;
+import space.arim.omnibus.OmnibusProvider;
+import xyz.titnoas.velocity.PacketListener.ChatPacketListener;
+import xyz.titnoas.velocity.PacketListener.TabCompleteListener;
 
-import java.util.ArrayList;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,10 +35,27 @@ public class VelocityPlugin {
 	private final ProxyServer server;
 	private final Logger logger;
 
+	private LibertyBans libertyBans;
+
 	public static int troll = 0;
+
+	public static VelocityPlugin velocityPlugin;
+
+	public LibertyBans getLibertyBans(){
+		return libertyBans;
+	}
+
+	public Logger getLogger(){
+		return logger;
+	}
+
+	public ProxyServer getProxyServer(){
+		return server;
+	}
 
 	@Inject
 	public VelocityPlugin(ProxyServer server, Logger logger) {
+		velocityPlugin = this;
 		this.server = server;
 		this.logger = logger;
 		CommandManager manager = server.getCommandManager();
@@ -58,7 +73,10 @@ public class VelocityPlugin {
 
 	@Subscribe
 	public void onProxyInitialization(ProxyInitializeEvent ev){
-		Protocolize.listenerProvider().registerListener(new Listener());
+		Protocolize.listenerProvider().registerListener(new TabCompleteListener());
+		Protocolize.listenerProvider().registerListener(new ChatPacketListener());
+		Omnibus omnibus = OmnibusProvider.getOmnibus();
+		libertyBans = omnibus.getRegistry().getProvider(LibertyBans.class).orElseThrow();
 	}
 
 	@Subscribe
