@@ -159,5 +159,12 @@
             <version>1.0.20</version>
         </dependency>
 
+
+        <dependency>
+            <groupId>me.vagdedes.spartan</groupId>
+            <artifactId>spartan</artifactId>
+            <version>451.1</version>
+        </dependency>
+
     </dependencies>
 </project>

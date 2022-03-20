@@ -1,9 +1,13 @@
 package xyz.titnoas.velocity;
 
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.player.TabCompleteEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -12,6 +16,9 @@ import com.velocitypowered.api.event.query.ProxyQueryEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.ServerConnection;
+import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.server.QueryResponse;
 import com.velocitypowered.api.proxy.server.ServerPing;
 import dev.simplix.protocolize.api.Protocolize;
@@ -20,11 +27,23 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import space.arim.libertybans.api.LibertyBans;
+import space.arim.libertybans.api.PlayerVictim;
+import space.arim.libertybans.api.PunishmentType;
+import space.arim.libertybans.api.punish.DraftPunishment;
+import space.arim.libertybans.api.punish.EnforcementOptions;
+import space.arim.libertybans.api.punish.Punishment;
+import space.arim.libertybans.api.punish.PunishmentDrafter;
+import space.arim.libertybans.api.scope.ScopeManager;
+import space.arim.libertybans.api.scope.ServerScope;
 import space.arim.omnibus.Omnibus;
 import space.arim.omnibus.OmnibusProvider;
 import xyz.titnoas.velocity.PacketListener.ChatPacketListener;
 import xyz.titnoas.velocity.PacketListener.TabCompleteListener;
+import xyz.titnoas.velocity.util.SpartanViolation;
+import xyz.titnoas.velocity.util.webhook.DiscordWebhook;
 
+import java.io.IOException;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,12 +51,16 @@ import java.util.logging.Logger;
 		url = "https://tcsmp.xyz", description = "Sus", authors = {"Lemon"})
 public class VelocityPlugin {
 
+	private static final MinecraftChannelIdentifier PluginComms = MinecraftChannelIdentifier.create("sussyplugin", "proxycomms");
+
 	private final ProxyServer server;
 	private final Logger logger;
 
 	private LibertyBans libertyBans;
 
 	public static int troll = 0;
+
+	public static HashMap<UUID, ArrayList<SpartanViolation>> spartanViolationMap = new HashMap<>();
 
 	public static VelocityPlugin velocityPlugin;
 
@@ -77,6 +100,7 @@ public class VelocityPlugin {
 		Protocolize.listenerProvider().registerListener(new ChatPacketListener());
 		Omnibus omnibus = OmnibusProvider.getOmnibus();
 		libertyBans = omnibus.getRegistry().getProvider(LibertyBans.class).orElseThrow();
+		server.getChannelRegistrar().register(PluginComms);
 	}
 
 	@Subscribe
@@ -139,6 +163,130 @@ public class VelocityPlugin {
 			ev.getSuggestions().clear();
 			ev.getSuggestions().add("Not today ;)");
 			return;
+		}
+	}
+
+	@Subscribe
+	public void onPluginMessage(PluginMessageEvent ev){
+		if(!ev.getIdentifier().equals(PluginComms))
+			return;
+
+		ev.setResult(PluginMessageEvent.ForwardResult.handled());
+
+		if(!(ev.getSource() instanceof ServerConnection serverConnection)){
+			return;
+		}
+
+		ByteArrayDataInput in = ev.dataAsDataStream();
+		ByteArrayDataOutput out = ByteStreams.newDataOutput();
+		String subChannel = in.readUTF();
+
+		if(subChannel.equals("ban")){
+
+			String UUIDToBan = in.readUTF();
+			String reason = in.readUTF();
+
+			PunishmentDrafter drafter = VelocityPlugin.velocityPlugin.getLibertyBans().getDrafter();
+
+			PlayerVictim victim = PlayerVictim.of(UUID.fromString(UUIDToBan));
+
+			var draftBan = drafter.draftBuilder().type(PunishmentType.BAN).victim(victim).reason(reason).build();
+			var enforcementOpts = draftBan.enforcementOptionsBuilder().broadcasting(EnforcementOptions.Broadcasting.SILENT).build();
+			draftBan.enactPunishment(enforcementOpts).thenAcceptSync(punishment -> {
+
+				if(punishment.isEmpty()){
+					out.writeBoolean(false);
+					reply(out, serverConnection, ev.getIdentifier());
+					return;
+				}
+
+				Punishment p = punishment.get();
+
+				out.writeBoolean(true);
+				out.writeUTF(p.getVictim().toString());
+				out.writeUTF(p.getReason());
+				out.writeLong(p.getIdentifier());
+				reply(out, serverConnection, ev.getIdentifier());
+				return;
+			});
+		}
+
+		if(subChannel.equals("violation")){
+
+			long userUUIDLeast = in.readLong();
+			long userUUIDMost = in.readLong();
+			String violationType = in.readUTF();
+			String violationData = in.readUTF();
+
+			UUID playerUuid = new UUID(userUUIDMost, userUUIDLeast);
+
+			Optional<Player> optionalPlayer = server.getPlayer(playerUuid);
+
+			if(optionalPlayer.isEmpty())
+				return;
+
+			if(!spartanViolationMap.containsKey(playerUuid))
+				spartanViolationMap.put(playerUuid, new ArrayList<>());
+
+				Player player = optionalPlayer.get();
+				List<SpartanViolation> violations = spartanViolationMap.get(playerUuid);
+
+				SpartanViolation violation = new SpartanViolation();
+				violation.violationData = violationData;
+				violation.violationType = violationType;
+				violation.time = System.currentTimeMillis();
+
+				violations.add(violation);
+
+				removeViolationsOlderThanXMillis(violations, 600 * 1000);
+				int count = countViolationsInLastXSeconds(violations, 600 * 1000);
+
+				if(count % 30 == 0 && count >= 30) {
+
+					server.getScheduler().buildTask(this, () -> {
+
+						DiscordWebhook webhook = new DiscordWebhook("https://discord.com/api/webhooks/954950892682088448/pUoZauDGDv1LMMVDtEbTK7zmoGzJHatCHzOFDjLjKePIIdpeHu66-7MfjPfChp-aivAM");
+						webhook.setContent(player.getUsername() + " has failed " + count + " checks in the last 10 minutes.");
+						try {
+							webhook.execute();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}).schedule();
+				}
+		}
+	}
+
+	public static int countViolationsInLastXSeconds(List<SpartanViolation> violations, int millis){
+
+		long currentTime = System.currentTimeMillis();
+
+		int count = 0;
+
+		for(SpartanViolation violation : violations){
+			if(Math.abs(violation.time - currentTime) <= millis)
+				count++;
+		}
+
+		return count;
+	}
+
+	public static void removeViolationsOlderThanXMillis(List<SpartanViolation> violations, long millisOld){
+
+		long currentTime = System.currentTimeMillis();
+
+		SpartanViolation[] copy = violations.toArray(SpartanViolation[]::new);
+
+		for (SpartanViolation spartanViolation : copy) {
+			if (Math.abs(spartanViolation.time - currentTime) > millisOld)
+				violations.remove(spartanViolation);
+		}
+	}
+
+	public static void reply(ByteArrayDataOutput out, ServerConnection serverConnection, ChannelIdentifier identifier){
+		byte[] data = out.toByteArray();
+		if (data.length > 0) {
+			serverConnection.sendPluginMessage(identifier, data);
 		}
 	}
 

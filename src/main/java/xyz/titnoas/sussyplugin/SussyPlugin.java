@@ -10,12 +10,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 import xyz.titnoas.sussyplugin.Commands.GiveTestBook;
 import xyz.titnoas.sussyplugin.Commands.Hello;
 import xyz.titnoas.sussyplugin.listener.ItemsListener;
+import xyz.titnoas.sussyplugin.listener.SpartanListener;
 import xyz.titnoas.sussyplugin.obtaining.essences.EssenceListener;
 import xyz.titnoas.sussyplugin.obtaining.essences.EssenceUtils;
 import xyz.titnoas.sussyplugin.spawners.CustomSpawner;
 import xyz.titnoas.sussyplugin.spawners.CustomSpawnerMetadataPersistentType;
 import xyz.titnoas.sussyplugin.utilshit.Glow;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
@@ -29,6 +31,20 @@ public class SussyPlugin extends JavaPlugin {
 	@Override
 	public void onEnable(){
 		sussyPlugin = this;
+		PluginManager manager = Bukkit.getPluginManager();
+
+		SpartanListener listener = new SpartanListener();
+
+		manager.registerEvents(listener, this);
+
+		//"sussyplugin:proxycomms"
+		getServer().getMessenger().registerOutgoingPluginChannel(this, "sussyplugin:proxycomms");
+		getServer().getMessenger().registerIncomingPluginChannel(this, "sussyplugin:proxycomms", listener);
+
+		File file = new File(Bukkit.getPluginsFolder() + "/SussyPlugin/" + "onlyspartan.empty");
+		if(file.exists())
+			return;
+
 		customItemKey = new NamespacedKey(this, "CUSTOMITEM");
 		CustomSpawner.customSpawnerMetaKey = new NamespacedKey(SussyPlugin.sussyPlugin, "CUSTOMSPAWNERMETA");
 		this.getLogger().log(Level.INFO, "Enabling SussyPlugin");
@@ -41,7 +57,7 @@ public class SussyPlugin extends JavaPlugin {
 		if(Glow.glowKey == null)
 			Glow.glowKey = new NamespacedKey(SussyPlugin.sussyPlugin, "GlowEnchant");
 		registerGlow();
-		PluginManager manager = Bukkit.getPluginManager();
+
 
 		manager.registerEvents(new ItemsListener(this), this);
 		manager.registerEvents(new EssenceListener(this), this);
