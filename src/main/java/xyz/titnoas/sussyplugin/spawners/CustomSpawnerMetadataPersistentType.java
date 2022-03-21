@@ -1,6 +1,6 @@
 package xyz.titnoas.sussyplugin.spawners;
 
-import org.bukkit.block.CreatureSpawner;
+import com.google.common.io.ByteStreams;
 import org.bukkit.entity.EntityType;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;

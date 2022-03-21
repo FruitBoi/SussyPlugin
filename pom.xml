@@ -61,7 +61,8 @@
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
-            <id>mojang-repo</id>
+            <id>minecraft-libraries</id>
+            <name>Minecraft Libraries</name>
             <url>https://libraries.minecraft.net/</url>
         </repository>
         <repository>
@@ -156,9 +157,9 @@
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>datafixerupper</artifactId>
-            <version>1.0.20</version>
+            <version>4.0.26</version>
+            <scope>compile</scope>
         </dependency>
-
 
         <dependency>
             <groupId>me.vagdedes.spartan</groupId>

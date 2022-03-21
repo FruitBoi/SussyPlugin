@@ -5,12 +5,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.plugin.PluginManager;
 import xyz.titnoas.sussyplugin.ItemUtils;
 import xyz.titnoas.sussyplugin.SussyPlugin;
@@ -123,6 +126,54 @@ public class EssenceUtils {
 		archeryIRecipe.setIngredient('S', EssenceUtils.GetEssenceByKey("SKELETON_ESSENCE").getRecipeChoice(3));
 		Bukkit.addRecipe(archeryIRecipe);
 
+
+
+
+		//Gentle enchant recipe.
+
+		//E - Sky Essence 2
+		//F - Feather
+		//S - Silk Touch I Book
+
+		NamespacedKey gentleIBook = new NamespacedKey(SussyPlugin.sussyPlugin, "GentleIBook");
+
+		ItemStack gentle = ItemUtils.CreateCustomEnchantBook(ItemUtils.GetCustomEnchantOfType(Gentle.class), 1);
+		ShapedRecipe gentleIRecipe = new ShapedRecipe(gentleIBook, gentle);
+
+		gentleIRecipe.shape("EFE", "FSF", "EFE");
+		gentleIRecipe.setIngredient('E', EssenceUtils.GetEssenceByKey("SHULKER_PROJ_ESSENCE").getRecipeChoice(2));
+		gentleIRecipe.setIngredient('F', Material.FEATHER);
+		ItemStack silkTouchBook = new ItemStack(Material.ENCHANTED_BOOK);
+
+		EnchantmentStorageMeta meta = (EnchantmentStorageMeta)silkTouchBook.getItemMeta();
+		meta.addStoredEnchant(Enchantment.SILK_TOUCH, 1, true);
+		silkTouchBook.setItemMeta(meta);
+
+		RecipeChoice.ExactChoice choice = new RecipeChoice.ExactChoice(silkTouchBook);
+
+		gentleIRecipe.setIngredient('S', choice);
+		Bukkit.addRecipe(gentleIRecipe);
+
+
+		//Capturing Enchant Book recipe I
+
+		NamespacedKey capturingEnchantIKey = new NamespacedKey(SussyPlugin.sussyPlugin, "CapturingIBook");
+		ItemStack capturing = ItemUtils.CreateCustomEnchantBook(ItemUtils.GetCustomEnchantOfType(Capturing.class), 1);
+
+		ShapedRecipe capturingIRecipe = new ShapedRecipe(capturingEnchantIKey, capturing);
+		//Zombie Essence 3 - Z
+		//Skeleton Essence 3 - S
+		//Creeper Essence 3 - C
+		//Bone Block - B
+		//Spawner - P
+		capturingIRecipe.shape("ZSC", "BPB", "CSZ");
+		capturingIRecipe.setIngredient('Z', EssenceUtils.GetEssenceByKey("ZOMBIE_ESSENCE").getRecipeChoice(3));
+		capturingIRecipe.setIngredient('S', EssenceUtils.GetEssenceByKey("SKELETON_ESSENCE").getRecipeChoice(3));
+		capturingIRecipe.setIngredient('C', EssenceUtils.GetEssenceByKey("CREEPER_ESSENCE").getRecipeChoice(3));
+		capturingIRecipe.setIngredient('B', Material.BONE_BLOCK);
+		capturingIRecipe.setIngredient('P', new RecipeChoice.MaterialChoice(Material.SPAWNER));
+
+		Bukkit.addRecipe(capturingIRecipe);
 		//I can't think of a recipe for butterfingers. That will come later.
 		//I also think that "Get Fucked" is a little OP currently, and we'll need some really difficult crafting recipe and to
 		//tweak the implementation of it to make it less OP. Since currently it completely disables your opponent's ability to

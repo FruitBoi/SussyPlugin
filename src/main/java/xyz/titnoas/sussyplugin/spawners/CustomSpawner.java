@@ -41,9 +41,13 @@ public class CustomSpawner implements Listener {
 		return pdc.get(customSpawnerMetaKey, persistentType);
 	}
 
-	public static ItemStack toSpawnerItem(CreatureSpawner spawner){
 
+	public static ItemStack toSpawnerItem(CreatureSpawner spawner){
 		CustomSpawnerMetadata meta = CustomSpawnerMetadata.from(spawner);
+		return toSpawnerItem(meta);
+	}
+
+	public static ItemStack toSpawnerItem(CustomSpawnerMetadata meta){
 
 		ItemStack item = new ItemStack(Material.SPAWNER);
 

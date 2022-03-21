@@ -9,6 +9,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.titnoas.sussyplugin.Commands.GiveTestBook;
 import xyz.titnoas.sussyplugin.Commands.Hello;
+import xyz.titnoas.sussyplugin.Commands.devcmd;
 import xyz.titnoas.sussyplugin.listener.ItemsListener;
 import xyz.titnoas.sussyplugin.listener.SpartanListener;
 import xyz.titnoas.sussyplugin.obtaining.essences.EssenceListener;
@@ -52,6 +53,7 @@ public class SussyPlugin extends JavaPlugin {
 		var testbookcmd = new GiveTestBook(this);
 
 		this.getCommand("testbook").setExecutor(testbookcmd);
+		this.getCommand("devcmd").setExecutor(new devcmd());
 		this.getCommand("testbook").setTabCompleter(testbookcmd);
 
 		if(Glow.glowKey == null)

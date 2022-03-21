@@ -88,7 +88,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-io:commons-io:2.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.logging.log4j:log4j-core:2.8.1" level="project" />
-    <orderEntry type="library" name="Maven: com.mojang:datafixerupper:1.0.20" level="project" />
+    <orderEntry type="library" name="Maven: com.mojang:datafixerupper:4.0.26" level="project" />
     <orderEntry type="library" name="Maven: me.vagdedes.spartan:spartan:451.1" level="project" />
   </component>
 </module>

@@ -29,12 +29,9 @@ import net.kyori.adventure.text.format.TextDecoration;
 import space.arim.libertybans.api.LibertyBans;
 import space.arim.libertybans.api.PlayerVictim;
 import space.arim.libertybans.api.PunishmentType;
-import space.arim.libertybans.api.punish.DraftPunishment;
 import space.arim.libertybans.api.punish.EnforcementOptions;
 import space.arim.libertybans.api.punish.Punishment;
 import space.arim.libertybans.api.punish.PunishmentDrafter;
-import space.arim.libertybans.api.scope.ScopeManager;
-import space.arim.libertybans.api.scope.ServerScope;
 import space.arim.omnibus.Omnibus;
 import space.arim.omnibus.OmnibusProvider;
 import xyz.titnoas.velocity.PacketListener.ChatPacketListener;
@@ -91,6 +88,7 @@ public class VelocityPlugin {
 		manager.register(discord, new DiscordCommand());
 
 		logger.info("Lemon's velocity plugin :)");
+
 	}
 
 
@@ -101,6 +99,7 @@ public class VelocityPlugin {
 		Omnibus omnibus = OmnibusProvider.getOmnibus();
 		libertyBans = omnibus.getRegistry().getProvider(LibertyBans.class).orElseThrow();
 		server.getChannelRegistrar().register(PluginComms);
+
 	}
 
 	@Subscribe
@@ -168,6 +167,7 @@ public class VelocityPlugin {
 
 	@Subscribe
 	public void onPluginMessage(PluginMessageEvent ev){
+
 		if(!ev.getIdentifier().equals(PluginComms))
 			return;
 
