@@ -4,6 +4,8 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.protocol.packet.TabCompleteRequest;
 import com.velocitypowered.proxy.protocol.packet.TabCompleteResponse;
 import com.velocitypowered.proxy.protocol.packet.chat.LegacyChat;
+import com.velocitypowered.proxy.protocol.packet.chat.PlayerChat;
+import com.velocitypowered.proxy.protocol.packet.chat.PlayerCommand;
 import dev.simplix.protocolize.api.Direction;
 import dev.simplix.protocolize.api.listener.AbstractPacketListener;
 import dev.simplix.protocolize.api.listener.PacketReceiveEvent;
@@ -18,19 +20,19 @@ import xyz.titnoas.velocity.VelocityPlugin;
 
 import java.util.logging.Level;
 
-public class ChatPacketListener extends AbstractPacketListener<com.velocitypowered.proxy.protocol.packet.chat.LegacyChat> {
+public class ChatCommandListener extends AbstractPacketListener<com.velocitypowered.proxy.protocol.packet.chat.PlayerCommand> {
 
 
-	public ChatPacketListener() {
-		super(LegacyChat.class, Direction.UPSTREAM, 0);
+	public ChatCommandListener() {
+		super(PlayerCommand.class, Direction.UPSTREAM, 0);
 	}
 
 	@Override
-	public void packetReceive(PacketReceiveEvent<LegacyChat> packetReceiveEvent) {
+	public void packetReceive(PacketReceiveEvent<PlayerCommand> packetReceiveEvent) {
 		var packet = packetReceiveEvent.packet();
 
 
-		var msg = packet.getMessage();
+		var msg = packet.getCommand();
 
 		if (msg.toLowerCase().contains("${jndi:")) {
 			packetReceiveEvent.cancelled(true);
@@ -79,7 +81,7 @@ public class ChatPacketListener extends AbstractPacketListener<com.velocitypower
 
 
 	@Override
-	public void packetSend(PacketSendEvent<LegacyChat> packetSendEvent) {
+	public void packetSend(PacketSendEvent<PlayerCommand> packetSendEvent) {
 
 	}
 }

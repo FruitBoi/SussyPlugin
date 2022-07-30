@@ -21,14 +21,6 @@ public class TabCompleteListener extends AbstractPacketListener<com.velocitypowe
 		if(!tabCompleteReq.getCommand().equalsIgnoreCase("/"))
 			return;
 
-		TabCompleteResponse.Offer offer = new TabCompleteResponse.Offer("/Nice try ;):lol");
-
-
-		TabCompleteResponse nop = new TabCompleteResponse();
-		nop.getOffers().add(offer);
-		nop.setTransactionId(tabCompleteReq.getTransactionId());
-
-		packetReceiveEvent.player().sendPacket(nop);
 		packetReceiveEvent.cancelled(true);
 	}
 

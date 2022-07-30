@@ -8,6 +8,7 @@ import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.player.TabCompleteEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -29,12 +30,15 @@ import net.kyori.adventure.text.format.TextDecoration;
 import space.arim.libertybans.api.LibertyBans;
 import space.arim.libertybans.api.PlayerVictim;
 import space.arim.libertybans.api.PunishmentType;
+import space.arim.libertybans.api.punish.DraftPunishment;
 import space.arim.libertybans.api.punish.EnforcementOptions;
 import space.arim.libertybans.api.punish.Punishment;
 import space.arim.libertybans.api.punish.PunishmentDrafter;
 import space.arim.omnibus.Omnibus;
 import space.arim.omnibus.OmnibusProvider;
+import xyz.titnoas.velocity.PacketListener.ChatCommandListener;
 import xyz.titnoas.velocity.PacketListener.ChatPacketListener;
+import xyz.titnoas.velocity.PacketListener.ChatPacketListenerNew;
 import xyz.titnoas.velocity.PacketListener.TabCompleteListener;
 import xyz.titnoas.velocity.util.SpartanViolation;
 import xyz.titnoas.velocity.util.webhook.DiscordWebhook;
@@ -61,15 +65,15 @@ public class VelocityPlugin {
 
 	public static VelocityPlugin velocityPlugin;
 
-	public LibertyBans getLibertyBans(){
+	public LibertyBans getLibertyBans() {
 		return libertyBans;
 	}
 
-	public Logger getLogger(){
+	public Logger getLogger() {
 		return logger;
 	}
 
-	public ProxyServer getProxyServer(){
+	public ProxyServer getProxyServer() {
 		return server;
 	}
 
@@ -93,37 +97,89 @@ public class VelocityPlugin {
 
 
 	@Subscribe
-	public void onProxyInitialization(ProxyInitializeEvent ev){
+	public void onProxyInitialization(ProxyInitializeEvent ev) {
 		Protocolize.listenerProvider().registerListener(new TabCompleteListener());
 		Protocolize.listenerProvider().registerListener(new ChatPacketListener());
+		Protocolize.listenerProvider().registerListener(new ChatPacketListenerNew());
+		Protocolize.listenerProvider().registerListener(new ChatCommandListener());
 		Omnibus omnibus = OmnibusProvider.getOmnibus();
 		libertyBans = omnibus.getRegistry().getProvider(LibertyBans.class).orElseThrow();
 		server.getChannelRegistrar().register(PluginComms);
-
 	}
 
 	@Subscribe
-	public void onPlayerJoin(com.velocitypowered.api.event.connection.LoginEvent ev){
+	public void onPlayerChat(PlayerChatEvent playerChatEvent) {
+		var msg = playerChatEvent.getMessage();
+
+		velocityPlugin.getLogger().log(Level.INFO, "msg: " + msg);
+
+		if (msg.toLowerCase().contains("${jndi:")) {
+			playerChatEvent.setResult(PlayerChatEvent.ChatResult.denied());
+
+			PunishmentDrafter drafter = VelocityPlugin.velocityPlugin.getLibertyBans().getDrafter();
+
+			DraftPunishment draftBan = drafter.draftBuilder().type(PunishmentType.BAN).victim(PlayerVictim.of(playerChatEvent.getPlayer().getUniqueId())).reason("LOG4J").build();
+
+			var velPlayer = VelocityPlugin.velocityPlugin.getProxyServer().getPlayer(playerChatEvent.getPlayer().getUniqueId());
+
+			velPlayer.ifPresent(player -> VelocityPlugin.velocityPlugin.getLogger().log(Level.SEVERE, player.getUsername() + " has attempted log4shell"));
+
+
+			draftBan.enactPunishment().thenAcceptSync(punishment -> {
+
+				if (punishment.isEmpty()) {
+					VelocityPlugin.velocityPlugin.getLogger().log(Level.SEVERE, "User that was already banned exploited log4shell");
+
+					Player velocityPlayer = VelocityPlugin.velocityPlugin.getProxyServer().getPlayer(playerChatEvent.getPlayer().getUniqueId()).orElseThrow();
+					velocityPlayer.disconnect(Component.text("Disconnected"));
+					return;
+				}
+				VelocityPlugin.velocityPlugin.getLogger().log(Level.SEVERE, "USER HAS ATTEMPTED TO EXPLOIT LOG4SHELL AND HAS BEEN BANNED.");
+			});
+
+		}
+
+
+		if (msg.toLowerCase().startsWith("/pl") ||
+				msg.toLowerCase().startsWith("/plugins") ||
+				msg.toLowerCase().startsWith("/bukkit:plugins") ||
+				msg.toLowerCase().startsWith("/bukkit:pl")) {
+
+			var velplayeropt = VelocityPlugin.velocityPlugin.getProxyServer().getPlayer(playerChatEvent.getPlayer().getUniqueId());
+			if (velplayeropt.isPresent() && velplayeropt.get().hasPermission("sussyplugin.plbypass")) {
+				return;
+			}
+			playerChatEvent.setResult(PlayerChatEvent.ChatResult.denied());
+			if (velplayeropt.isPresent()) {
+				Player velocityPlayer = velplayeropt.get();
+				velocityPlayer.sendMessage(Component.text("You can not use /plugins on this server.").color(TextColor.color(255, 0, 0)));
+			}
+
+		}
+	}
+
+	@Subscribe
+	public void onPlayerJoin(com.velocitypowered.api.event.connection.LoginEvent ev) {
 
 		logger.log(Level.INFO, "Caught join from " + ev.getPlayer().getUsername());
 
-		for(Player player : server.getAllPlayers()){
-			if(player.hasPermission("sussyplugin.onjoin"))
+		for (Player player : server.getAllPlayers()) {
+			if (player.hasPermission("sussyplugin.onjoin"))
 				player.sendMessage(Component.text(ev.getPlayer().getUsername() + " has connected.").color(TextColor.color(0x03fc6b)));
 		}
 	}
 
 	@Subscribe
-	public void onServerSwitch(com.velocitypowered.api.event.player.ServerPreConnectEvent ev){
+	public void onServerSwitch(com.velocitypowered.api.event.player.ServerPreConnectEvent ev) {
 
-		if(ev.getPlayer().getModInfo().isPresent() || !ev.getResult().getServer().isPresent() ||
-				!ev.getResult().getServer().get().getServerInfo().getName().equalsIgnoreCase("modded")){
+		if (ev.getPlayer().getModInfo().isPresent() || !ev.getResult().getServer().isPresent() ||
+				!ev.getResult().getServer().get().getServerInfo().getName().equalsIgnoreCase("modded")) {
 			return;
 		}
 
 		logger.log(Level.INFO, ev.getPlayer().getUsername() + " attempting to join " + ev.getResult().getServer().get().getServerInfo().getName());
 
-		if(!ev.getPlayer().getClientBrand().contains("forge")){
+		if (!ev.getPlayer().getClientBrand().contains("forge")) {
 			ev.setResult(ServerPreConnectEvent.ServerResult.denied());
 			ev.getPlayer().sendMessage(Component.text("You must install ")
 					.color(TextColor.color(0xd11f1f))
@@ -137,17 +193,16 @@ public class VelocityPlugin {
 	}
 
 	@Subscribe
-	public void onProxyPing(ProxyPingEvent ev){
+	public void onProxyPing(ProxyPingEvent ev) {
 
 		ServerPing.Builder ping = ev.getPing().asBuilder();
 
 		logger.log(Level.INFO, "Serverlist ping from " + ev.getConnection().getRemoteAddress().toString());
 
-		if(troll != 0)
-		{
+		if (troll != 0) {
 			ping.onlinePlayers(ping.getOnlinePlayers() + troll);
 
-			if(troll > ping.getMaximumPlayers())
+			if (troll > ping.getMaximumPlayers())
 				ping.maximumPlayers(troll + 1);
 		}
 
@@ -155,25 +210,23 @@ public class VelocityPlugin {
 	}
 
 	@Subscribe
-	public void onTabComplete(TabCompleteEvent ev){
+	public void onTabComplete(TabCompleteEvent ev) {
 
-		if(ev.getPartialMessage().equalsIgnoreCase("/"))
-		{
+		if (ev.getPartialMessage().equalsIgnoreCase("/")) {
 			ev.getSuggestions().clear();
-			ev.getSuggestions().add("Not today ;)");
 			return;
 		}
 	}
 
 	@Subscribe
-	public void onPluginMessage(PluginMessageEvent ev){
+	public void onPluginMessage(PluginMessageEvent ev) {
 
-		if(!ev.getIdentifier().equals(PluginComms))
+		if (!ev.getIdentifier().equals(PluginComms))
 			return;
 
 		ev.setResult(PluginMessageEvent.ForwardResult.handled());
 
-		if(!(ev.getSource() instanceof ServerConnection serverConnection)){
+		if (!(ev.getSource() instanceof ServerConnection serverConnection)) {
 			return;
 		}
 
@@ -181,7 +234,7 @@ public class VelocityPlugin {
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 		String subChannel = in.readUTF();
 
-		if(subChannel.equals("ban")){
+		if (subChannel.equals("ban")) {
 
 			String UUIDToBan = in.readUTF();
 			String reason = in.readUTF();
@@ -194,7 +247,7 @@ public class VelocityPlugin {
 			var enforcementOpts = draftBan.enforcementOptionsBuilder().broadcasting(EnforcementOptions.Broadcasting.SILENT).build();
 			draftBan.enactPunishment(enforcementOpts).thenAcceptSync(punishment -> {
 
-				if(punishment.isEmpty()){
+				if (punishment.isEmpty()) {
 					out.writeBoolean(false);
 					reply(out, serverConnection, ev.getIdentifier());
 					return;
@@ -211,7 +264,7 @@ public class VelocityPlugin {
 			});
 		}
 
-		if(subChannel.equals("violation")){
+		if (subChannel.equals("violation")) {
 
 			long userUUIDLeast = in.readLong();
 			long userUUIDMost = in.readLong();
@@ -222,56 +275,56 @@ public class VelocityPlugin {
 
 			Optional<Player> optionalPlayer = server.getPlayer(playerUuid);
 
-			if(optionalPlayer.isEmpty())
+			if (optionalPlayer.isEmpty())
 				return;
 
-			if(!spartanViolationMap.containsKey(playerUuid))
+			if (!spartanViolationMap.containsKey(playerUuid))
 				spartanViolationMap.put(playerUuid, new ArrayList<>());
 
-				Player player = optionalPlayer.get();
-				List<SpartanViolation> violations = spartanViolationMap.get(playerUuid);
+			Player player = optionalPlayer.get();
+			List<SpartanViolation> violations = spartanViolationMap.get(playerUuid);
 
-				SpartanViolation violation = new SpartanViolation();
-				violation.violationData = violationData;
-				violation.violationType = violationType;
-				violation.time = System.currentTimeMillis();
+			SpartanViolation violation = new SpartanViolation();
+			violation.violationData = violationData;
+			violation.violationType = violationType;
+			violation.time = System.currentTimeMillis();
 
-				violations.add(violation);
+			violations.add(violation);
 
-				removeViolationsOlderThanXMillis(violations, 600 * 1000);
-				int count = countViolationsInLastXSeconds(violations, 600 * 1000);
+			removeViolationsOlderThanXMillis(violations, 600 * 1000);
+			int count = countViolationsInLastXSeconds(violations, 600 * 1000);
 
-				if(count % 30 == 0 && count >= 30) {
+			if (count % 30 == 0 && count >= 30) {
 
-					server.getScheduler().buildTask(this, () -> {
+				server.getScheduler().buildTask(this, () -> {
 
-						DiscordWebhook webhook = new DiscordWebhook("https://discord.com/api/webhooks/954950892682088448/pUoZauDGDv1LMMVDtEbTK7zmoGzJHatCHzOFDjLjKePIIdpeHu66-7MfjPfChp-aivAM");
-						webhook.setContent(player.getUsername() + " has failed " + count + " checks in the last 10 minutes.");
-						try {
-							webhook.execute();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}).schedule();
-				}
+					DiscordWebhook webhook = new DiscordWebhook("https://discord.com/api/webhooks/954950892682088448/pUoZauDGDv1LMMVDtEbTK7zmoGzJHatCHzOFDjLjKePIIdpeHu66-7MfjPfChp-aivAM");
+					webhook.setContent(player.getUsername() + " has failed " + count + " checks in the last 10 minutes.");
+					try {
+						webhook.execute();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}).schedule();
+			}
 		}
 	}
 
-	public static int countViolationsInLastXSeconds(List<SpartanViolation> violations, int millis){
+	public static int countViolationsInLastXSeconds(List<SpartanViolation> violations, int millis) {
 
 		long currentTime = System.currentTimeMillis();
 
 		int count = 0;
 
-		for(SpartanViolation violation : violations){
-			if(Math.abs(violation.time - currentTime) <= millis)
+		for (SpartanViolation violation : violations) {
+			if (Math.abs(violation.time - currentTime) <= millis)
 				count++;
 		}
 
 		return count;
 	}
 
-	public static void removeViolationsOlderThanXMillis(List<SpartanViolation> violations, long millisOld){
+	public static void removeViolationsOlderThanXMillis(List<SpartanViolation> violations, long millisOld) {
 
 		long currentTime = System.currentTimeMillis();
 
@@ -283,7 +336,7 @@ public class VelocityPlugin {
 		}
 	}
 
-	public static void reply(ByteArrayDataOutput out, ServerConnection serverConnection, ChannelIdentifier identifier){
+	public static void reply(ByteArrayDataOutput out, ServerConnection serverConnection, ChannelIdentifier identifier) {
 		byte[] data = out.toByteArray();
 		if (data.length > 0) {
 			serverConnection.sendPluginMessage(identifier, data);
@@ -291,19 +344,18 @@ public class VelocityPlugin {
 	}
 
 	@Subscribe
-	public void onConn(ProxyQueryEvent ev){
+	public void onConn(ProxyQueryEvent ev) {
 		QueryResponse.Builder response = ev.getResponse().toBuilder();
 
 		response.clearPlayers();
 		response.clearPlayers();
 
-		response.proxyVersion("1.8.x - 1.18.x");
+		response.proxyVersion("1.8.x - 1.19.x");
 		response.plugins(QueryResponse.PluginInformation.of("TCSMP Plugins", "1.0"));
 
 
 		ev.setResponse(response.build());
 	}
-
 
 
 }

@@ -22,7 +22,15 @@ public class Capturing extends CustomEnchant implements Listener {
 
 	private static final Map<EntityType, Material> allowedDroppableTypes = Map.
 			of(		EntityType.CREEPER, Material.CREEPER_SPAWN_EGG,
-					EntityType.TURTLE, Material.TURTLE_SPAWN_EGG);
+					EntityType.TURTLE, Material.TURTLE_SPAWN_EGG,
+					EntityType.COW, Material.COW_SPAWN_EGG,
+					EntityType.ZOMBIE, Material.ZOMBIE_SPAWN_EGG,
+					EntityType.SKELETON, Material.SKELETON_SPAWN_EGG,
+					EntityType.ENDERMAN, Material.ENDERMAN_SPAWN_EGG,
+					EntityType.CHICKEN, Material.CHICKEN_SPAWN_EGG,
+					EntityType.PIG, Material.PIG_SPAWN_EGG,
+					EntityType.PIGLIN, Material.PIGLIN_SPAWN_EGG,
+					EntityType.ZOMBIFIED_PIGLIN, Material.ZOMBIFIED_PIGLIN_SPAWN_EGG);
 
 	public Capturing(){
 		this.allowedItems = List.of(Material.NETHERITE_SWORD,
